@@ -19,3 +19,49 @@ docker-compose -f docker-compose.yaml -f docker-compose-dev.yaml logs : atach lo
 docker-compose -f docker-compose.yaml -f docker-compose-dev.yaml ps
 docker-compose -f docker-compose.yaml -f docker-compose-dev.yaml stop
 docker-compose -f docker-compose.yaml -f docker-compose-dev.yaml down
+
+#Eureka server
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+		</dependency>
+Anotar clesse main com @EnableEurekaServer
+//usar essas configs
+server.port=8016
+spring.application.name=eurekadiscovery
+eureka.client.register-with-eureka=false
+eureka.client.fetch-registry=false
+eureka.client.service-url.defaultZone: http://localhost:8010/eureka
+
+#Eureka client
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-netflix-eureka-client</artifactId>
+		</dependency>
+Anotar a classe main @EnableEurekaClient
+Configs
+server.port=0
+#automatic assigne port
+spring.application.name=users-ws
+eureka.client.service-url.defaultZone=http://localhost:8010/eureka
+
+#Curso russo projetos
+eureka-server
+users-service
+account-service
+zuul-api-gatway
+
+#Zuul
+Deve se registrar no eureka
+chamada url base localhost:8011/users-ws/users/status/check
+
+@SpringBootApplication
+@EnableZuulProxy
+@EnableEurekaClient
+public class ZuulApiGatwayApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(ZuulApiGatwayApplication.class, args);
+	}
+
+}
