@@ -45,12 +45,6 @@ server.port=0
 spring.application.name=users-ws
 eureka.client.service-url.defaultZone=http://localhost:8010/eureka
 
-#Curso russo projetos
-eureka-server
-users-service
-account-service
-zuul-api-gatway
-
 #Zuul
 Deve se registrar no eureka
 chamada url base localhost:8011/users-ws/users/status/check
@@ -65,3 +59,17 @@ public class ZuulApiGatwayApplication {
 	}
 
 }
+
+#Curso russo projetos
+account-service
+eureka-server
+users-service
+zuul-api-gatway
+
+#Curso paktpublishing
+blog
+bookmarks
+configserver
+reverseproxy
+serviceregistry
+
