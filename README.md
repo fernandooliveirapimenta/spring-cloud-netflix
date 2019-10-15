@@ -73,3 +73,18 @@ configserver
 reverseproxy
 serviceregistry
 
+
+#startando spring boot mvn
+mvn spring-boot:run -Dspring-boot.run.arguments=--spring.application.instance_id=fernando
+mvn spring-boot:run -Dspring-boot.run.arguments=--spring.application.instance_id=fernando,--server.port=833333
+
+#add h2 in memory
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.4.193</version>
+			<scope>runtime</scope>
+		</dependency>
+spring.h2.console.enabled=true
+spring.h2.console.settings.web-allow-others=true
+localhost:8080/h2-console
