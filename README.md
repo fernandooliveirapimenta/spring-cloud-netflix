@@ -88,3 +88,6 @@ mvn spring-boot:run -Dspring-boot.run.arguments=--spring.application.instance_id
 spring.h2.console.enabled=true
 spring.h2.console.settings.web-allow-others=true
 localhost:8080/h2-console
+jdbc:h2:mem:testdb
+user: sa
+pass: 
