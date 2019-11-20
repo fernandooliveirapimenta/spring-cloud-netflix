@@ -63,7 +63,7 @@ public class ZuulApiGatwayApplication {
 
 #Curso russo projetos
 account-service
-eureka-server
+eureka-discovery
 users-service
 zuul-api-gatway
 
@@ -92,3 +92,18 @@ localhost:8080/h2-console
 jdbc:h2:mem:testdb
 user: sa
 pass: 
+
+#rabbitmq docker
+docker container run -d -p 15672:15672 -p 5672:5672 -p 25676:25676 rabbitmq:3-management
+
+#mysql docker
+
+docker-compose -f docker/mysql-docker-compose.yaml up -d
+docker-compose -f docker/mysql-docker-compose.yaml down
+
+#JCE java cryptograph extension 
+Unlimitedjce/*
+
+keytool -genkeypair -alias apiEncryptionKey -keyalg RSA -dname "CN=Fernando,OU=Api,O=fernando.com,L=Brasil,S=ON,C=CA" -keypass fefe@123456 -keystore apiEncryptionKey.jks -storepass fefe@123456
+
+keytool -importkeystore -srckeystore apiEncryptionKey.jks -destkeystore apiEncryptionKey.jks -deststoretype pkcs12
