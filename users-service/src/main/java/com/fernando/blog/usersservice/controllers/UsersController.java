@@ -3,6 +3,7 @@ package com.fernando.blog.usersservice.controllers;
 import com.fernando.blog.usersservice.dto.UserDTO;
 import com.fernando.blog.usersservice.model.CreateUserRequestModel;
 import com.fernando.blog.usersservice.model.CreateUserResponseModel;
+import com.fernando.blog.usersservice.model.UserResponseModel;
 import com.fernando.blog.usersservice.service.UsersService;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.env.Environment;
@@ -50,5 +51,15 @@ public class UsersController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(returnValue);
+    }
+
+    @GetMapping(value = "{userId}")
+    public ResponseEntity<UserResponseModel> getUser(@PathVariable String userId) {
+        UserDTO userDTO = usersService.getUserByUserId(userId);
+        if(userDTO == null)
+           return ResponseEntity.ok().build();
+        UserResponseModel returnValue = new
+                ModelMapper().map(userDTO, UserResponseModel.class);
+        return ResponseEntity.status(HttpStatus.OK).body(returnValue);
     }
 }

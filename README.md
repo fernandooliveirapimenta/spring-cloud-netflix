@@ -66,6 +66,8 @@ account-service
 eureka-discovery
 users-service
 zuul-api-gatway
+photoapp-api
+ConfigServerRusso
 
 #Curso paktpublishing
 blog
