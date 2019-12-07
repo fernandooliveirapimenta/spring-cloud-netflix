@@ -7,6 +7,8 @@ import com.fernando.blog.usersservice.dto.UserDTO;
 import com.fernando.blog.usersservice.model.AlbumResponseModel;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
@@ -32,6 +34,7 @@ public class UserServiceImpl implements UsersService {
     private final Environment environment;
     private final AlbumHttpClient albumHttpClient;
 
+    Logger logger = LoggerFactory.getLogger(this.getClass());
     public UserServiceImpl(UsersRepository usersRepository,
                            BCryptPasswordEncoder bCryptPasswordEncoder, RestTemplate restTemplate,
                            Environment environment, AlbumHttpClient albumHttpClient) {
@@ -75,6 +78,8 @@ public class UserServiceImpl implements UsersService {
 //                HttpMethod.GET, null,
 //                new ParameterizedTypeReference<List<AlbumResponseModel>>() {
 //                });
+
+        logger.info("logando iformacao em streamd");
 
         List<AlbumResponseModel> retorno= albumHttpClient.getAlbums(userId);
         map.setAlbums(retorno);
