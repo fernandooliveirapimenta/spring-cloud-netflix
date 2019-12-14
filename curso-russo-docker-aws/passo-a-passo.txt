@@ -1,0 +1,39 @@
+Region: us-east-1
+
+## Elastic Ip for ec2
+Config Sever
+Eureka Server
+
+##Primeira EC2 for Config Server
+imagem: Amazon Linux AMI 2018.03.0 ja vem com java instalado, docker, mysql, php,
+instance-type: t2.small
+instalar docker: serguir outro txt
+security-group-rules:
+SSH for all ips
+4369  for all ips - Rabbitmq
+5671  for all ips - Rabbitmq
+5672  for all ips - Rabbitmq
+15671 for all ips - Rabbitmq
+15672 for all ips - Rabbitmq
+8012  for config server for my ip
+8012  for config server for range 172.31.0.0/24 ip
+
+#Rodando Config Server from docker-hub
+docker login
+docker run -d -p 8012:8012 -e "spring.rabbitmq.host=172.17.0.2" fernando107/config-server:latest
+
+
+
+##Segunda EC2 for Eureka Server
+imagem: Amazon Linux AMI 2018.03.0 ja vem com java instalado, docker, mysql, php,
+instance-type: t2.micro
+instalar docker: serguir outro txt
+security-group-rules:
+SSH for all ips
+TCP Rule 8010 range ip from VPC ex: 172.31.0.0/16
+8010 for my ip
+
+#Rodando Eureka server from docker-hub
+docker login
+docker run -d -p 8010:8010 -e "spring.cloud.config.uri=http://IP_EC2:8012" fernando107/eureka-server:latest
+

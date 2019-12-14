@@ -1,0 +1,9 @@
+## Config server russo no mesmo diretorio
+docker build -t config-server --force-rm=true .
+docker login
+docker push fernando107/config-server:latest
+
+## Eureka server 
+docker build -t eureka-server --force-rm=true .
+docker login
+docker push fernando107/eureka-server:latest
