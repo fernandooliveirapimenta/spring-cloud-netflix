@@ -118,6 +118,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
+		<finalName>users</finalName>
 	</build>
 
 </project>

@@ -23,8 +23,7 @@ docker login
 docker run -d -p 8012:8012 -e "spring.rabbitmq.host=172.17.0.2" fernando107/config-server:latest
 
 
-
-##Segunda EC2 for Eureka Server
+##Segunta EC2 for Eureka server
 imagem: Amazon Linux AMI 2018.03.0 ja vem com java instalado, docker, mysql, php,
 instance-type: t2.micro
 instalar docker: serguir outro txt
@@ -37,3 +36,110 @@ TCP Rule 8010 range ip from VPC ex: 172.31.0.0/16
 docker login
 docker run -d -p 8010:8010 -e "spring.cloud.config.uri=http://IP_EC2:8012" fernando107/eureka-server:latest
 
+
+##Terceira Ec2 for Zuul
+imagem: Amazon Linux AMI 2018.03.0 ja vem com java instalado, docker, mysql, php,
+instance-type: t2.micro
+instalar docker: serguir outro txt
+security-group-rules:
+SSH for all ips
+TCP Rule 8011 for all
+
+#Rodando Zuul api gatway from docker-hub
+docker login
+docker container -e "spring.cloud.config.uri=http://<config server>:8012" -e "spring.rabbitmq.host=<rabbit host>" -p 8011:8011 -d fernando107/zuul-api-gateway:latest
+
+
+##Quarta EC2 for Elastic search/kinaba
+imagem: Amazon Linux AMI 2018.03.0 ja vem com java instalado, docker, mysql, php,
+instance-type: t2.small
+instalar docker: serguir outro txt
+security-group-rules:
+SSH for all ips
+Custom tcp 9200 for my vpc range ip
+Custom tcp 9300 for my vpc range ip
+Custom tcp 5601 for my vpc range ip
+9200 for my ip
+9300 for my ip
+5601 for my ip
+
+#Criando network para rodar elastic e kibana juntos
+docker network create --driver bridge api-network
+
+#Rodando Elastic search from docker-hub
+docker login
+docker container run -d -v esdata1:/usr/share/elasticsearch/data --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" --network api-network elasticsearch:7.3.0
+
+#Rodando Kibana from docker-hub
+docker login
+docker container run -d  -p 5601:5601 --network api-network kibana:7.3.0 
+
+
+##Quinta EC2 for albums-ws
+imagem: Amazon Linux AMI 2018.03.0 ja vem com java instalado, docker, mysql, php,
+instance-type: t2.micro
+instalar docker: serguir outro txt
+security-group-rules:
+SSH for all ips
+TCP Rule 8011 for all
+Http 8980 for range vpc
+Http 8980 for my ip
+
+
+#Rodando albums-ws from docker-hub
+docker login
+docker container run -d -e "eureka.client.serviceUrl.dafaultZone=http://<eureka host>:8010/eureka" -e "server.port=8980" -p 8989:8980 -e "eureka.instance.ip-address=<elastic if for albums-ws>>" -e "eureka.instance.prefer-ip-address=true" -e "logging.file=/api-logs/albums-ws.log" -v /home/ec2-user/api-logs:/api-logs fernando107/albums-ws:latest
+
+
+#Rodando logastash from docker-hub
+docker container run -d --name albums-ws-logstash -v /home/ec2-user/api-logs:/api-logs fernando107/logstash-sidecar:latest 
+
+docker logs albums-ws-logstash
+docker logs albums-ws
+
+#Checar se esta enviando para o elastic
+Acessar url do elastic <elastic-host>:9200/_cat/indices
+
+
+##Sexta EC2 for mysql
+imagem: Amazon Linux AMI 2018.03.0 ja vem com java instalado, docker, mysql, php,
+instance-type: t2.micro
+instalar docker: serguir outro txt
+security-group-rules:
+SSH for all ips
+TCP Rule 3306 for range vpc ip
+TCP Rule 3306 for my ip
+
+
+#Rodando mysql from docker-hub
+docker login
+docker container run -p 3306:3306 --name mysql-docker-container -e MYSQL_ROOT_PASSWORD=fernando -e MYSQL_DATABASE=photo_app -e MYSQL_USER=fernando -e MYSQL_PASSWORD=fernando -v /var/lib/mysql:/var/lib/mysql  mysql:latest
+
+docker container exec -it mysql-docker-container bash
+mysql -u fernando -p 
+
+
+
+##Setima EC2 for users-ws
+imagem: Amazon Linux AMI 2018.03.0 ja vem com java instalado, docker, mysql, php,
+instance-type: t2.small
+instalar docker: serguir outro txt
+security-group-rules:
+SSH for all ips
+All TCP for zuul vpc range
+
+
+#Rodando users-ws from docker-hub
+docker login
+
+docker container run -d -e "spring.cloud.config.uri=http://<config ip>:8012" -e "spring.rabbitmq.host=<config id>" -e "eureka.client.serviceUrl.dafaultZone=http://<eureka host>:8010/eureka" -e "spring.datasource.url=jdbc:mysql://<mysql ip>:3306/photo_app?serverTimezone=UTC" --network host -e "eureka.instance.ip-address=<elastic if for albums-ws>>" -e "eureka.instance.prefer-ip-address=true" -e "logging.file=/api-logs/users-ws.log" -v /home/ec2-user/api-logs:/api-logs fernando107/users-ws:latest
+
+
+#Rodando logastash from docker-hub
+docker container run -d --name users-ws-logstash -v /home/ec2-user/api-logs:/api-logs fernando107/logstash-sidecar:latest 
+
+docker logs users-ws-logstash
+docker logs users-ws
+
+#Checar se esta enviando para o elastic
+Acessar url do elastic <elastic-host>:9200/_cat/indices
